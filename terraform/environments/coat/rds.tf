@@ -36,44 +36,38 @@ resource "aws_rds_cluster" "test_db_cluster" {
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
 }
 
-# resource "aws_rds_global_cluster" "example" {
-#   global_cluster_identifier = "global-test"
-#   engine                    = "aurora"
-#   engine_version            = "5.6.mysql_aurora.1.22.2"
-#   database_name             = "example_db"
-# }
+resource "aws_rds_global_cluster" "test_gloval_cluster" {
+  global_cluster_identifier = "global-test"
+  engine                    = "aurora"
+  database_name             = "example_db"
+}
 
-# resource "aws_db_cluster_snapshot" "example" {
-#   db_cluster_identifier          = aws_rds_cluster.example.id
-#   db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
-# }
+resource "aws_db_cluster_snapshot" "example" {
+  db_cluster_identifier          = aws_rds_cluster.test_db_cluster.id
+  db_cluster_snapshot_identifier = "resourcetestsnapshot1234"
+}
 
-# resource "aws_rds_cluster_endpoint" "eligible" {
-#   cluster_identifier          = aws_rds_cluster.default.id
-#   cluster_endpoint_identifier = "reader"
-#   custom_endpoint_type        = "READER"
+resource "aws_rds_cluster_endpoint" "eligible" {
+  cluster_identifier          = aws_rds_cluster.test_db_cluster.id
+  cluster_endpoint_identifier = "reader"
+  custom_endpoint_type        = "READER"
+}
 
-#   excluded_members = [
-#     aws_rds_cluster_instance.test1.id,
-#     aws_rds_cluster_instance.test2.id,
-#   ]
-# }
+resource "aws_rds_cluster_parameter_group" "default" {
+  name        = "rds-cluster-pg"
+  family      = "aurora5.6"
+  description = "RDS default cluster parameter group"
 
-# resource "aws_rds_cluster_parameter_group" "default" {
-#   name        = "rds-cluster-pg"
-#   family      = "aurora5.6"
-#   description = "RDS default cluster parameter group"
+  parameter {
+    name  = "character_set_server"
+    value = "utf8"
+  }
 
-#   parameter {
-#     name  = "character_set_server"
-#     value = "utf8"
-#   }
-
-#   parameter {
-#     name  = "character_set_client"
-#     value = "utf8"
-#   }
-# }
+  parameter {
+    name  = "character_set_client"
+    value = "utf8"
+  }
+}
 
 resource "aws_db_instance" "default" {
   allocated_storage    = 10
