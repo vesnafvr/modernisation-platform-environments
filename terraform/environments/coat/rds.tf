@@ -79,6 +79,7 @@ resource "aws_db_instance" "default" {
   username             = "foo"
   password             = "foobarbaz"
   parameter_group_name = aws_db_parameter_group.test_db_parameter_group.name
+  backup_retention_period = 1
   skip_final_snapshot  = true
 
   publicly_accessible = false
@@ -182,4 +183,30 @@ resource "aws_db_snapshot" "test_db_snapshot" {
 # Validates SCP allows rds:CreateDBShardGroup.
 resource "aws_rds_shard_group" "test_db_shard_group" {
   db_shard_group_identifier = "${local.application_name}-${local.environment}-test-db-shard-group"
+}
+
+# Validates SCP allows rds:CreateDBInstanceReadReplica.
+resource "aws_db_instance" "test_read_replica" {
+  identifier          = "${local.application_name}-${local.environment}-test-read-replica"
+  instance_class      = "db.t3.micro"
+  replicate_source_db = aws_db_instance.default.identifier
+
+  publicly_accessible   = false
+  db_subnet_group_name  = aws_db_subnet_group.test_db_subnet_group.name
+  vpc_security_group_ids = [aws_security_group.test_db_sg.id]
+  skip_final_snapshot   = true
+}
+
+resource "aws_sns_topic" "test_rds_events" {
+  name = "${local.application_name}-${local.environment}-test-rds-events"
+}
+
+# Validates SCP allows rds:CreateEventSubscription.
+resource "aws_db_event_subscription" "test_db_event_subscription" {
+  name             = "${local.application_name}-${local.environment}-test-db-event-subscription"
+  sns_topic        = aws_sns_topic.test_rds_events.arn
+  source_type      = "db-instance"
+  source_ids       = [aws_db_instance.default.id]
+  event_categories = ["availability"]
+  enabled          = true
 }
