@@ -78,7 +78,7 @@ resource "aws_db_instance" "default" {
   instance_class       = "db.t3.micro"
   username             = "foo"
   password             = "foobarbaz"
-  parameter_group_name = "default.mysql8.0"
+  parameter_group_name = aws_db_parameter_group.test_db_parameter_group.name
   skip_final_snapshot  = true
 
   publicly_accessible = false
@@ -163,4 +163,11 @@ resource "aws_db_proxy_endpoint" "test_proxy_endpoint" {
     data.aws_subnet.private_subnets_b.id
   ]
   target_role = "READ_WRITE"
+}
+
+# Validates SCP allows rds:CreateDBParameterGroup.
+resource "aws_db_parameter_group" "test_db_parameter_group" {
+  name        = "${local.application_name}-${local.environment}-test-db-pg"
+  family      = "mysql8.0"
+  description = "Test DB parameter group for SCP validation"
 }
