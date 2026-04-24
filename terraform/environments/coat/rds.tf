@@ -176,7 +176,7 @@ resource "aws_db_parameter_group" "test_db_parameter_group" {
 
 # Validates SCP allows rds:CreateDBSnapshot.
 resource "aws_db_snapshot" "test_db_snapshot" {
-  db_instance_identifier = aws_db_instance.default.id
+  db_instance_identifier = aws_db_instance.default.identifier
   db_snapshot_identifier = "${local.application_name}-${local.environment}-test-db-snapshot"
 }
 
@@ -193,10 +193,10 @@ resource "aws_db_instance" "test_read_replica" {
   instance_class      = "db.t3.micro"
   replicate_source_db = aws_db_instance.default.arn
 
-  publicly_accessible   = false
-  db_subnet_group_name  = aws_db_subnet_group.test_db_subnet_group.name
+  publicly_accessible    = false
+  db_subnet_group_name   = aws_db_subnet_group.test_db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
-  skip_final_snapshot   = true
+  skip_final_snapshot    = true
 }
 
 resource "aws_sns_topic" "test_rds_events" {
@@ -208,7 +208,7 @@ resource "aws_db_event_subscription" "test_db_event_subscription" {
   name             = "${local.application_name}-${local.environment}-test-db-event-subscription"
   sns_topic        = aws_sns_topic.test_rds_events.arn
   source_type      = "db-instance"
-  source_ids       = [aws_db_instance.default.id]
+  source_ids       = [aws_db_instance.default.identifier]
   event_categories = ["availability"]
   enabled          = true
 }
