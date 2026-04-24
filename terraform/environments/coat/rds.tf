@@ -158,6 +158,7 @@ resource "aws_db_proxy" "test_proxy" {
 resource "aws_db_proxy_endpoint" "test_proxy_endpoint" {
   db_proxy_name          = aws_db_proxy.test_proxy.name
   db_proxy_endpoint_name = "${local.application_name}-${local.environment}-test-proxy-endpoint"
+  vpc_security_group_ids = [aws_security_group.test_db_sg.id]
   vpc_subnet_ids = [
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_b.id
