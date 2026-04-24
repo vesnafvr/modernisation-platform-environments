@@ -38,7 +38,7 @@ resource "aws_rds_cluster" "test_db_cluster" {
 
 resource "aws_rds_global_cluster" "test_global_cluster" {
   global_cluster_identifier = "global-test"
-  engine                    = "mysql"
+  engine                    = "aurora-mysql"
   database_name             = "example_db"
 }
 
