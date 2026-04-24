@@ -58,6 +58,15 @@
         "arn:aws:glue:${region}:${account}:database/*",
         "arn:aws:glue:${region}:${account}:table/*/*"
       ]
+    },
+    {
+      "Sid": "RdsProxyCreateForTesting",
+      "Effect": "Allow",
+      "Action": [
+        "rds:CreateDBProxy",
+        "rds:CreateDBProxyEndpoint"
+      ],
+      "Resource": "*"
     }
   ]
 }

@@ -87,3 +87,80 @@ resource "aws_db_instance" "default" {
   db_subnet_group_name = aws_db_subnet_group.test_db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
 }
+
+# Validates SCP allows rds:CreateDBProxy by creating a minimal proxy.
+resource "aws_secretsmanager_secret" "test_db_proxy_secret" {
+  name = "${local.application_name}-${local.environment}-test-db-proxy-secret"
+}
+
+resource "aws_secretsmanager_secret_version" "test_db_proxy_secret_version" {
+  secret_id = aws_secretsmanager_secret.test_db_proxy_secret.id
+  secret_string = jsonencode({
+    username = aws_rds_cluster.test_db_cluster.master_username
+    password = aws_rds_cluster.test_db_cluster.master_password
+  })
+}
+
+data "aws_iam_policy_document" "test_db_proxy_assume_role" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "test_db_proxy_secret_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [aws_secretsmanager_secret.test_db_proxy_secret.arn]
+  }
+}
+
+resource "aws_iam_role" "test_db_proxy_role" {
+  name               = "${local.application_name}-${local.environment}-test-db-proxy-role"
+  assume_role_policy = data.aws_iam_policy_document.test_db_proxy_assume_role.json
+}
+
+resource "aws_iam_role_policy" "test_db_proxy_secret_access" {
+  name   = "${local.application_name}-${local.environment}-test-db-proxy-secret-access"
+  role   = aws_iam_role.test_db_proxy_role.id
+  policy = data.aws_iam_policy_document.test_db_proxy_secret_access.json
+}
+
+resource "aws_db_proxy" "test_proxy" {
+  name                   = "${local.application_name}-${local.environment}-test-proxy"
+  engine_family          = "MYSQL"
+  role_arn               = aws_iam_role.test_db_proxy_role.arn
+  vpc_security_group_ids = [aws_security_group.test_db_sg.id]
+  vpc_subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id
+  ]
+  require_tls = false
+
+  auth {
+    auth_scheme = "SECRETS"
+    iam_auth    = "DISABLED"
+    secret_arn  = aws_secretsmanager_secret.test_db_proxy_secret.arn
+  }
+
+  depends_on = [aws_secretsmanager_secret_version.test_db_proxy_secret_version]
+}
+
+# Validates SCP allows rds:CreateDBProxyEndpoint by creating an endpoint.
+resource "aws_db_proxy_endpoint" "test_proxy_endpoint" {
+  db_proxy_name          = aws_db_proxy.test_proxy.name
+  db_proxy_endpoint_name = "${local.application_name}-${local.environment}-test-proxy-endpoint"
+  vpc_subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id
+  ]
+  target_role = "READ_WRITE"
+}
