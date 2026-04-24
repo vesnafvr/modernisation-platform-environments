@@ -180,13 +180,6 @@ resource "aws_db_snapshot" "test_db_snapshot" {
   db_snapshot_identifier = "${local.application_name}-${local.environment}-test-db-snapshot"
 }
 
-# Validates SCP allows rds:CreateDBShardGroup.
-resource "aws_rds_shard_group" "test_db_shard_group" {
-  db_shard_group_identifier = "${local.application_name}-${local.environment}-test-db-shard-group"
-  db_cluster_identifier     = aws_rds_cluster.test_db_cluster.id
-  max_acu                   = 64
-}
-
 resource "aws_sns_topic" "test_rds_events" {
   name = "${local.application_name}-${local.environment}-test-rds-events"
 }
