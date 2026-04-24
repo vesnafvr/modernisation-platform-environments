@@ -212,3 +212,12 @@ resource "aws_db_event_subscription" "test_db_event_subscription" {
   event_categories = ["availability"]
   enabled          = true
 }
+
+# Validates SCP allows rds:CreateOptionGroup.
+resource "aws_db_option_group" "test_db_option_group" {
+  name                     = "${local.application_name}-${local.environment}-test-db-option-group"
+  option_group_description = "Test DB option group for SCP validation"
+  engine_name              = "mysql"
+  major_engine_version     = "8.0"
+}
+
