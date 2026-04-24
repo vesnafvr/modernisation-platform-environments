@@ -171,3 +171,14 @@ resource "aws_db_parameter_group" "test_db_parameter_group" {
   family      = "mysql8.0"
   description = "Test DB parameter group for SCP validation"
 }
+
+# Validates SCP allows rds:CreateDBSecurityGroup (legacy RDS API).
+# https://registry.terraform.io/providers/hashicorp/aws/4.1.0/docs/resources/db_security_group
+resource "aws_db_security_group" "test_db_security_group" {
+  name        = "${local.application_name}-${local.environment}-test-db-security-group-legacy"
+  description = "Legacy DB security group for SCP validation"
+
+  ingress {
+    cidr = data.aws_vpc.shared.cidr_block
+  }
+}
