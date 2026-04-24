@@ -29,6 +29,7 @@ resource "aws_rds_cluster" "test_db_cluster" {
   master_password         = "must_be_eight_characters"
   backup_retention_period = 5
   preferred_backup_window = "07:00-09:00"
+  skip_final_snapshot = true
 
   storage_encrypted   = true
 
