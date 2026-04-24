@@ -36,9 +36,9 @@ resource "aws_rds_cluster" "test_db_cluster" {
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
 }
 
-resource "aws_rds_global_cluster" "test_gloval_cluster" {
+resource "aws_rds_global_cluster" "test_global_cluster" {
   global_cluster_identifier = "global-test"
-  engine                    = "aurora"
+  engine                    = "mysql"
   database_name             = "example_db"
 }
 
