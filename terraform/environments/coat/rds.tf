@@ -183,3 +183,14 @@ resource "aws_db_security_group" "test_db_security_group" {
     cidr = data.aws_vpc.shared.cidr_block
   }
 }
+
+# Validates SCP allows rds:CreateDBSnapshot.
+resource "aws_db_snapshot" "test_db_snapshot" {
+  db_instance_identifier = aws_db_instance.default.id
+  db_snapshot_identifier = "${local.application_name}-${local.environment}-test-db-snapshot"
+}
+
+# Validates SCP allows rds:CreateDBShardGroup.
+resource "aws_rds_shard_group" "test_db_shard_group" {
+  db_shard_group_identifier = "${local.application_name}-${local.environment}-test-db-shard-group"
+}
