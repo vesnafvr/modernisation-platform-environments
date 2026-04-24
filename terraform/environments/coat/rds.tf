@@ -23,8 +23,6 @@ resource "aws_security_group" "test_db_sg" {
 resource "aws_rds_cluster" "test_db_cluster" {
   cluster_identifier      = "test-db-cluster"
   engine                  = "aurora-mysql"
-  # Aurora Limitless (DB shard groups) requires a newer Aurora MySQL 3.x engine.
-  engine_version          = "8.0.mysql_aurora.3.13.2"
   availability_zones      = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
   database_name           = "mydb"
   master_username         = "foo"
