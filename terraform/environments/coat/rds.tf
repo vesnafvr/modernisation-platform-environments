@@ -189,18 +189,6 @@ resource "aws_rds_shard_group" "test_db_shard_group" {
   max_acu                   = 64
 }
 
-# Validates SCP allows rds:CreateDBInstanceReadReplica.
-resource "aws_db_instance" "test_read_replica" {
-  identifier          = "${local.application_name}-${local.environment}-test-read-replica"
-  instance_class      = "db.t3.micro"
-  replicate_source_db = aws_db_instance.default.arn
-
-  publicly_accessible    = false
-  db_subnet_group_name   = aws_db_subnet_group.test_db_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.test_db_sg.id]
-  skip_final_snapshot    = true
-}
-
 resource "aws_sns_topic" "test_rds_events" {
   name = "${local.application_name}-${local.environment}-test-rds-events"
 }
