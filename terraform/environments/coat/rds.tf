@@ -6,6 +6,20 @@ resource "aws_db_subnet_group" "test_db_subnet_group" {
   ]
 }
 
+resource "aws_security_group" "test_db_sg" {
+  name        = "${local.application_name}-${local.environment}-test-db-security-group"
+  description = "Test DB Security Group"
+  vpc_id      = data.aws_vpc.shared.id
+
+  egress {
+    description = "outbound access"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_instance" "default" {
   allocated_storage    = 10
   db_name              = "mydb"
@@ -21,4 +35,5 @@ resource "aws_db_instance" "default" {
   storage_encrypted   = true
 
   db_subnet_group_name = aws_db_subnet_group.test_db_subnet_group.name
+  vpc_security_group_ids = [aws_security_group.test_db_sg.id]
 }
