@@ -80,6 +80,8 @@ resource "aws_db_instance" "default" {
   password             = "foobarbaz"
   parameter_group_name = aws_db_parameter_group.test_db_parameter_group.name
   backup_retention_period = 1
+  # Ensure backup retention updates are active before creating read replica.
+  apply_immediately    = true
   skip_final_snapshot  = true
 
   publicly_accessible = false
