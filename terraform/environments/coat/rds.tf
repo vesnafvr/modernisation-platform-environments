@@ -215,3 +215,10 @@ resource "aws_db_instance" "test_read_replica" {
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
   skip_final_snapshot    = true
 }
+
+# Validates SCP allows rds:CreateDBShardGroup.
+resource "aws_rds_shard_group" "test_db_shard_group" {
+  db_shard_group_identifier = "${local.application_name}-${local.environment}-test-db-shard-group"
+  db_cluster_identifier     = aws_rds_cluster.test_db_cluster.id
+  max_acu                   = 64
+}
