@@ -23,7 +23,7 @@ resource "aws_security_group" "test_db_sg" {
 resource "aws_rds_cluster" "test_db_cluster" {
   cluster_identifier      = "test-db-cluster"
   engine                  = "aurora-mysql"
-  engine_version          = "8.4.8"
+  engine_version          = "8.0.mysql_aurora.3.12.0"
   availability_zones      = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
   database_name           = "mydb"
   master_username         = "foo"
@@ -75,7 +75,7 @@ resource "aws_db_instance" "default" {
   allocated_storage    = 10
   db_name              = "mydb"
   engine               = "mysql"
-  engine_version       = "8.0"
+  engine_version       = "8.4.8"
   instance_class       = "db.t3.micro"
   username             = "foo"
   password             = "foobarbaz"
