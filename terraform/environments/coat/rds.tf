@@ -23,6 +23,7 @@ resource "aws_security_group" "test_db_sg" {
 resource "aws_rds_cluster" "test_db_cluster" {
   cluster_identifier      = "test-db-cluster"
   engine                  = "aurora-mysql"
+  engine_version          = "8.4.8"
   availability_zones      = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
   database_name           = "mydb"
   master_username         = "foo"
