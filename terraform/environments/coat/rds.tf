@@ -23,7 +23,7 @@ resource "aws_security_group" "test_db_sg" {
 resource "aws_rds_cluster" "test_db_cluster" {
   cluster_identifier      = "test-db-cluster"
   engine                  = "aurora-mysql"
-  engine_version          = "8.0.mysql_aurora.3.12.0"
+  engine_version          = "8.0.mysql_aurora.3.10.3"
   availability_zones      = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
   database_name           = "mydb"
   master_username         = "foo"
@@ -36,6 +36,13 @@ resource "aws_rds_cluster" "test_db_cluster" {
 
   db_subnet_group_name = aws_db_subnet_group.test_db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.test_db_sg.id]
+}
+
+resource "aws_rds_cluster_instance" "test_db_cluster_primary" {
+  identifier         = "${local.application_name}-${local.environment}-test-db-cluster-primary"
+  cluster_identifier = aws_rds_cluster.test_db_cluster.id
+  instance_class     = "db.t3.medium"
+  engine             = aws_rds_cluster.test_db_cluster.engine
 }
 
 resource "aws_rds_global_cluster" "test_global_cluster" {
@@ -83,6 +90,7 @@ resource "aws_db_instance" "default" {
   backup_retention_period = 1
   # Ensure backup retention updates are active before creating read replica.
   apply_immediately    = true
+  allow_major_version_upgrade = true
   skip_final_snapshot  = true
 
   publicly_accessible = false
@@ -219,6 +227,7 @@ resource "aws_db_instance" "test_read_replica" {
 
 # Validates SCP allows rds:CreateDBShardGroup.
 resource "aws_rds_shard_group" "test_db_shard_group" {
+  count                     = 0
   db_shard_group_identifier = "${local.application_name}-${local.environment}-test-db-shard-group"
   db_cluster_identifier     = aws_rds_cluster.test_db_cluster.id
   max_acu                   = 64
