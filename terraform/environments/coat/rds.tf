@@ -181,8 +181,8 @@ resource "aws_db_proxy_endpoint" "test_proxy_endpoint" {
 # Validates SCP allows rds:CreateDBParameterGroup.
 resource "aws_db_parameter_group" "test_db_parameter_group" {
   name        = "${local.application_name}-${local.environment}-test-db-pg"
-  family      = "mysql8.0"
-  description = "Test DB parameter group for SCP validation"
+  family      = "mysql8.4"
+  description = "Test DB parameter group for MySQL 8.4 SCP validation"
 }
 
 # Validates SCP allows rds:CreateDBSnapshot.
@@ -210,7 +210,7 @@ resource "aws_db_option_group" "test_db_option_group" {
   name                     = "${local.application_name}-${local.environment}-test-db-option-group"
   option_group_description = "Test DB option group for SCP validation"
   engine_name              = "mysql"
-  major_engine_version     = "8.0"
+  major_engine_version     = "8.4"
 }
 
 # Validates SCP allows rds:CreateDBInstanceReadReplica.
