@@ -233,6 +233,12 @@ resource "aws_db_instance" "test_read_replica" {
   skip_final_snapshot    = true
 }
 
+# Validates SCP allows rds:CreateBlueGreenDeployment.
+resource "aws_rds_blue_green_deployment" "test_blue_green_deployment" {
+  blue_green_deployment_name = "${local.application_name}-${local.environment}-test-blue-green-deployment"
+  source                     = aws_db_instance.default.arn
+}
+
 # Validates SCP allows rds:CreateDBShardGroup.
 resource "aws_rds_shard_group" "test_db_shard_group" {
   count                     = 0
