@@ -234,22 +234,9 @@ resource "aws_db_instance" "test_read_replica" {
 }
 
 # Validates SCP allows rds:CreateBlueGreenDeployment.
-resource "null_resource" "test_blue_green_deployment" {
-  triggers = {
-    source_arn = aws_db_instance.default.arn
-    name       = "${local.application_name}-${local.environment}-test-blue-green-deployment"
-  }
-
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command = <<-EOT
-      set -euo pipefail
-      aws rds create-blue-green-deployment \
-        --blue-green-deployment-name "${self.triggers.name}" \
-        --source "${self.triggers.source_arn}" \
-        --target-engine-version "8.4.8"
-    EOT
-  }
+resource "aws_rds_blue_green_deployment" "test_blue_green_deployment" {
+  blue_green_deployment_name = "${local.application_name}-${local.environment}-test-blue-green-deployment"
+  source                     = aws_db_instance.default.arn
 }
 
 # Validates SCP allows rds:CreateDBShardGroup.
